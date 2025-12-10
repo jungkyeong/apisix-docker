@@ -1,0 +1,68 @@
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd
+    restart: unless-stopped
+    environment:
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_DATA_DIR=/etcd-data
+    volumes:
+      - ./data/etcd:/etcd-data
+    networks:
+      - apisix-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  apisix:
+    image: apache/apisix:3.9.1-debian
+    container_name: apisix
+    restart: unless-stopped
+    depends_on:
+      etcd:
+        condition: service_healthy
+    ports:
+      - "9080:9080"    # HTTP
+      - "9443:9443"    # HTTPS
+      - "9180:9180"    # Admin API (HTTPS)
+      - "9091:9091"    # Prometheus metrics
+      - "9092:9092"    # Control API
+    volumes:
+      - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./certs/data/apisix.crt:/etc/apisix/ssl/apisix.crt:ro
+      - ./certs/data/apisix.key:/etc/apisix/ssl/apisix.key:ro
+      - ./certs/data/ca.crt:/etc/apisix/ssl/ca.crt:ro
+      - ./data/apisix/logs:/usr/local/apisix/logs
+    networks:
+      - apisix-network
+    healthcheck:
+      test: ["CMD-SHELL", "apisix status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  apisix-dashboard:
+    image: apache/apisix-dashboard:3.0.1-alpine
+    container_name: apisix-dashboard
+    restart: unless-stopped
+    depends_on:
+      etcd:
+        condition: service_healthy
+      apisix:
+        condition: service_healthy
+    ports:
+      - "9000:9000"    # HTTP
+      - "9444:9443"    # HTTPS (호스트 9444 -> 컨테이너 9443)
+    volumes:
+      - ./dashboard/conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
+      - ./certs/data/dashboard.crt:/etc/apisix-dashboard/ssl/dashboard.crt:ro
+      - ./certs/data/dashboard.key:/etc/apisix-dashboard/ssl/dashboard.key:ro
+    networks:
+      - apisix-network
+
+networks:
+  apisix-network:
+    driver: bridge

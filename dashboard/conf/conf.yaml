@@ -1,0 +1,113 @@
+conf:
+  listen:
+    host: 0.0.0.0
+    port: 9000
+  etcd:
+    endpoints:
+      - "http://etcd:2379" # APISIX 간 공유되는 설정 저장소
+    prefix: "/apisix"
+  log:
+    error_log:
+      level: warn
+      file_path: /dev/stderr # 에러 로그 위치
+    access_log:
+      file_path: /dev/stdout # 접근 로그 위치
+
+  security: # 보안 정책 설정
+    content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src xx.xx.xx.xx:3000"
+
+  ssl:
+    host: 0.0.0.0
+    port: 9443
+    cert: /etc/apisix-dashboard/ssl/dashboard.crt
+    key: /etc/apisix-dashboard/ssl/dashboard.key
+
+authentication:
+  secret: password # 토큰 비밀 키
+  expire_time: 3600
+  users:
+    - username: admin
+      password: admin
+
+plugins:
+  - api-breaker
+  - authz-casbin
+  - authz-casdoor
+  - authz-keycloak
+  - aws-lambda
+  - azure-functions
+  - basic-auth
+  - batch-requests
+  - clickhouse-logger
+  - client-control
+  - consumer-restriction
+  - cors
+  - csrf
+  - datadog
+  - degraphql
+  - dubbo-proxy
+  - echo
+  - elasticsearch-logger
+  - error-log-logger
+  - example-plugin
+  - ext-plugin-post-req
+  - ext-plugin-post-resp
+  - ext-plugin-pre-req
+  - fault-injection
+  - file-logger
+  - forward-auth
+  - google-cloud-logging
+  - grpc-transcode
+  - grpc-web
+  - gzip
+  - hmac-auth
+  - http-logger
+  - ip-restriction
+  - jwt-auth
+  - kafka-logger
+  - kafka-proxy
+  - key-auth
+  - ldap-auth
+  - limit-conn
+  - limit-count
+  - limit-req
+  - loggly
+  - loki-logger
+  - mocking
+  - mqtt-proxy
+  - multi-auth
+  - node-status
+  - opa
+  - openid-connect
+  - opentelemetry
+  - openwhisk
+  - prometheus
+  - proxy-cache
+  - proxy-control
+  - proxy-mirror
+  - proxy-rewrite
+  - public-api
+  - real-ip
+  - redirect
+  - referer-restriction
+  - request-id
+  - request-validation
+  - response-rewrite
+  - rocketmq-logger
+  - server-info
+  - serverless-post-function
+  - serverless-pre-function
+  - skywalking
+  - skywalking-logger
+  - sls-logger
+  - splunk-hec-logging
+  - syslog
+  - tcp-logger
+  - tencent-cloud-cls
+  - traffic-split
+  - ua-restriction
+  - udp-logger
+  - uri-blocker
+  - wolf-rbac
+  - zipkin
+  - cas-auth
