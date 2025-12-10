@@ -3,6 +3,7 @@ services:
     image: quay.io/coreos/etcd:v3.5.17
     container_name: etcd
     restart: unless-stopped
+    user: root
     environment:
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
@@ -35,7 +36,6 @@ services:
       - ./certs/data/apisix.crt:/etc/apisix/ssl/apisix.crt:ro
       - ./certs/data/apisix.key:/etc/apisix/ssl/apisix.key:ro
       - ./certs/data/ca.crt:/etc/apisix/ssl/ca.crt:ro
-      - ./data/apisix/logs:/usr/local/apisix/logs
     networks:
       - apisix-network
     healthcheck:

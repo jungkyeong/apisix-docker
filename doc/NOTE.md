@@ -38,3 +38,6 @@
 - users: 초기 접속 계정 정보
 
 3. 플러그인
+
+### 저장되는 볼륨의 내용
+- data/etcd: etcd 데이터: Routes, Upstreams, Services, SSL 인증서, Plugins 등 APISIX 설정 데이터

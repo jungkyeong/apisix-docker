@@ -1,0 +1,25 @@
+# 데이터 폴더
+data/
+
+# 인증서
+certs/data/
+
+# Git
+.git/
+.gitignore
+
+# 문서
+doc/
+*.md
+
+# 환경 변수 (민감 정보)
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
