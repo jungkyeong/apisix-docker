@@ -32,6 +32,7 @@ DNS.1 = localhost
 DNS.2 = apisix
 DNS.3 = *.apisix.local
 IP.1 = 127.0.0.1
+IP.2 = 192.168.0.11
 EOF
 
 openssl x509 -req -in apisix.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
@@ -49,11 +50,12 @@ basicConstraints=CA:FALSE
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 subjectAltName = @alt_names
 
-[alt_names] 
+[alt_names]
 DNS.1 = localhost
 DNS.2 = apisix-dashboard
 DNS.3 = *.apisix.local
 IP.1 = 127.0.0.1
+IP.2 = 192.168.0.11
 EOF
 
 openssl x509 -req -in dashboard.csr -CA ca.crt -CAkey ca.key -CAcreateserial \

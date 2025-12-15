@@ -41,3 +41,23 @@
 
 ### 저장되는 볼륨의 내용
 - data/etcd: etcd 데이터: Routes, Upstreams, Services, SSL 인증서, Plugins 등 APISIX 설정 데이터
+
+### Admin API 등록
+- curl 추가 (admin api 인증서 ssl 리소스 등록용)
+- fallback_sni: IP 주소 HTTPS 접속 시 SNI 매칭 localhost로 임시 적용
+
+
+## APISIX 정의, 원리 정의
+1. flow
+- Client -> Route -> Upstream -> Target(Service)
+    - Client 요청 도착
+    - Route 매칭 수행
+    - 선택된 Route에서 Upstream 확인
+    - Upstream 로드밸런싱 알고리즘 실행
+    - Target Node 선택
+    - 선택된 노드로 Proxying
+
+2. 정의
+- Route : 어떤 요청(URL/Method/Host/IP 등)을 어떤 서비스로 보낼지 결정하는 규칙
+- Upstream : 실제 서비스의 서버 목록
+- Target(Node) : Upstream에 포함된 실제 백엔드 서버(IP:PORT)
