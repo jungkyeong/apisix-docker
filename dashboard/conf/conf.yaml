@@ -4,7 +4,7 @@ conf:
     port: 9000
   etcd:
     endpoints:
-      - "http://etcd:2379" # APISIX 간 공유되는 설정 저장소
+      - "http://apisix-etcd-2:9207" # APISIX 간 공유되는 설정 저장소
     prefix: "/apisix"
   log:
     error_log:

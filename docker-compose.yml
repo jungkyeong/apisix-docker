@@ -1,69 +1,71 @@
 services:
-  etcd:
+  etcd-2:
     image: quay.io/coreos/etcd:v3.5.17
-    container_name: etcd
+    container_name: apisix-etcd-2
     restart: unless-stopped
     user: root
     environment:
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://apisix-etcd-2:9207
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:9207
       - ETCD_DATA_DIR=/etcd-data
     volumes:
       - ./data/etcd:/etcd-data
     networks:
-      - apisix-network
+      - apisix-network-2
     healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
+      test: ["CMD", "etcdctl", "endpoint", "health", "--endpoints=http://127.0.0.1:9207"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  apisix:
-    build: ./apisix
+  apisix-2:
+    build:
+      context: .
+      dockerfile: apisix/Dockerfile
     image: apisix-custom:3.8.0
-    container_name: apisix
+    container_name: apisix-2
     restart: unless-stopped
     depends_on:
-      etcd:
+      etcd-2:
         condition: service_healthy
     ports:
-      - "9080:9080"    # HTTP
-      - "9443:9443"    # HTTPS
-      - "9180:9180"    # Admin API (HTTPS)
-      - "9091:9091"    # Prometheus metrics
-      - "9092:9092"    # Control API
+      - "9202:9202"    # HTTP
+      - "9204:9204"    # HTTPS
+      - "9203:9203"    # Admin API (HTTPS)
+      - "9205:9205"    # Prometheus metrics
+      - "9206:9206"    # Control API
     volumes:
       - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs/data/apisix.crt:/etc/apisix/ssl/apisix.crt:ro
       - ./certs/data/apisix.key:/etc/apisix/ssl/apisix.key:ro
       - ./certs/data/ca.crt:/etc/apisix/ssl/ca.crt:ro
     networks:
-      - apisix-network
+      - apisix-network-2
     healthcheck:
       test: ["CMD-SHELL", "apisix status || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  apisix-dashboard:
+  apisix-dashboard-2:
     image: apache/apisix-dashboard:3.0.1-alpine
-    container_name: apisix-dashboard
+    container_name: apisix-dashboard-2
     restart: unless-stopped
     depends_on:
-      etcd:
+      etcd-2:
         condition: service_healthy
-      apisix:
+      apisix-2:
         condition: service_healthy
     ports:
-      - "9000:9000"    # HTTP
-      - "9444:9443"    # HTTPS (호스트 9444 -> 컨테이너 9443)
+      - "9200:9000"    # HTTP (호스트 9200 -> 컨테이너 9000)
+      - "9201:9443"    # HTTPS (호스트 9201 -> 컨테이너 9443)
     volumes:
       - ./dashboard/conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
       - ./certs/data/dashboard.crt:/etc/apisix-dashboard/ssl/dashboard.crt:ro
       - ./certs/data/dashboard.key:/etc/apisix-dashboard/ssl/dashboard.key:ro
     networks:
-      - apisix-network
+      - apisix-network-2
 
 networks:
-  apisix-network:
+  apisix-network-2:
     driver: bridge

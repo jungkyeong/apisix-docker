@@ -5,8 +5,13 @@
 
 ### 인증서 생성 스크립트 사용
 - Ubuntu 서버 혹은 WSL에서
+1. self sign
 - cd certs
-- bash generate-certs.sh
+- bash generate-self-certs.sh
+
+2. ca sign
+- bash generate-rootca.sh
+- bash generate-server.sh
 
 ### Docker 실행
 1. 빌드 및 실행
@@ -23,14 +28,18 @@
 
 ### etcd에 인증서 등록
 - 컨테이너 초기 시작 시 SSL 인증서 etcd에 admin api를 통해 등록
-- sudo docker exec apisix curl -k https://127.0.0.1:9180/apisix/admin/ssls/1 \
+- sudo docker exec apisix-2 curl -k https://127.0.0.1:9203/apisix/admin/ssls/1 \
   -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" \
   -X PUT \
   -d '{
-    "cert": "'"$(sudo docker exec apisix cat /etc/apisix/ssl/apisix.crt)"'",
-    "key": "'"$(sudo docker exec apisix cat /etc/apisix/ssl/apisix.key)"'",
+    "cert": "'"$(sudo docker exec apisix-2 cat /etc/apisix/ssl/apisix.crt)"'",
+    "key": "'"$(sudo docker exec apisix-2 cat /etc/apisix/ssl/apisix.key)"'",
     "snis": ["192.168.0.11", "localhost", "apisix"]
   }'
+
+- powershell에서
+- docker cp register-ssl.sh apisix:/tmp/
+docker exec apisix sh /tmp/register-ssl.sh
 
 ### 확인
 1. curl -k "https://192.168.0.11:9443" --head | grep Server
@@ -46,18 +55,10 @@
   - Upstream Type: Node
   - Scheme: HTTPS
 
-  2. Client app upstream 1 생성
-  - name: keycloak-upstream
+  2. Client app upstream 생성
+  - name: client1-upstream
   - host: 192.168.0.11
   - port: 8543
-  - Algorithm: Round Robin
-  - Upstream Type: Node
-  - Scheme: HTTPS
-
-  3. Client app upstream 2 생성
-  - name: keycloak-upstream
-  - host: 192.168.0.11
-  - port: 8643
   - Algorithm: Round Robin
   - Upstream Type: Node
   - Scheme: HTTPS
@@ -145,22 +146,22 @@
 
   '''
 
-3. Cleint app 설정 필요 (앱은 keycloak-client 참고)
+3. Cleint app 설정 필요
   1. client 1
   - server-url: https://192.168.0.11:9443
-  - redirect-uri: https://192.168.0.11:9443/pqc-area/callback
+  - redirect-uri: https://192.168.0.11:9443/realm1/callback
   2. client 2
   - server-url: https://192.168.0.11:9443
-  - redirect-uri: https://192.168.0.11:9443/no-pqc-area/callback
+  - redirect-uri: https://192.168.0.11:9443/realm2/callback
 
 4. keycloak
-  1. pqc-area용 realm의 client:
-  - Valid redirect URIs: https://192.168.0.11:9443/pqc-area/*
-  - Valid post logout redirect URIs: https://192.168.0.11:9443/pqc-area/*
+  1. pqc-area realm의 client:
+  - Valid redirect URIs: https://192.168.0.11:9443/realm1/*
+  - Valid post logout redirect URIs: https://192.168.0.11:9443/realm1/*
   - Web origins: https://192.168.0.11:9443
-  2. no-pqc-area용 realm의 client:
-  - Valid redirect URIs: https://192.168.0.11:9443/no-pqc-area/*
-  - Valid post logout redirect URIs: https://192.168.0.11:9443/no-pqc-area/*
+  2. no-pqc-area realm의 client:
+  - Valid redirect URIs: https://192.168.0.11:9443/realm2/*
+  - Valid post logout redirect URIs: https://192.168.0.11:9443/realm2/*
   - Web origins: https://192.168.0.11:9443
 
 

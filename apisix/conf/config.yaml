@@ -1,20 +1,20 @@
 apisix:
   node_listen:
-    - port: 9080 # HTTP Port
+    - port: 9202 # HTTP Port
 
   ssl: # SSL/HTTPS 설정
     enable: true
     listen:
-      - port: 9443
+      - port: 9204
         enable_http2: true
     ssl_protocols: "TLSv1.2 TLSv1.3"
     ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
     fallback_sni: "localhost"
 
   enable_control: true # control API (네트워크 정보, 상태 조회)
-  control: 
+  control:
     ip: "0.0.0.0"
-    port: 9092
+    port: 9206
 
   admin_key_required: true
 
@@ -29,7 +29,7 @@ deployment: # admin API (네트워크 제어)
         role: viewer
     admin_listen:
       ip: 0.0.0.0
-      port: 9180
+      port: 9203
     https_admin: true
     admin_api_mtls:
       admin_ssl_cert: /etc/apisix/ssl/apisix.crt
@@ -37,7 +37,7 @@ deployment: # admin API (네트워크 제어)
 
   etcd:
     host:
-      - "http://etcd:2379"
+      - "http://apisix-etcd-2:9207"
     prefix: "/apisix"
     timeout: 30
 
@@ -45,7 +45,7 @@ plugin_attr:
   prometheus:
     export_addr:
       ip: "0.0.0.0"
-      port: 9091
+      port: 9205
 
 plugins:
   - real-ip
