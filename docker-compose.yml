@@ -29,11 +29,11 @@ services:
       etcd-2:
         condition: service_healthy
     ports:
-      - "9202:9202"    # HTTP
-      - "9204:9204"    # HTTPS
-      - "9203:9203"    # Admin API (HTTPS)
-      - "9205:9205"    # Prometheus metrics
-      - "9206:9206"    # Control API
+      - "19202:9202"    # HTTP
+      - "19204:9204"    # HTTPS
+      - "19203:9203"   # Admin API (HTTPS)
+      - "19205:9205"    # Prometheus metrics
+      - "19206:9206"    # Control API
     volumes:
       - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs/data/apisix.crt:/etc/apisix/ssl/apisix.crt:ro
@@ -57,8 +57,8 @@ services:
       apisix-2:
         condition: service_healthy
     ports:
-      - "9200:9000"    # HTTP (호스트 9200 -> 컨테이너 9000)
-      - "9201:9443"    # HTTPS (호스트 9201 -> 컨테이너 9443)
+      - "19200:9000"    # HTTP (호스트 9200 -> 컨테이너 9000)
+      - "19201:9443"    # HTTPS (호스트 9201 -> 컨테이너 9443)
     volumes:
       - ./dashboard/conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
       - ./certs/data/dashboard.crt:/etc/apisix-dashboard/ssl/dashboard.crt:ro

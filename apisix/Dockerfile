@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # OpenSSL 소스 복사 (빌드된 폴더 또는 tar.gz)
-COPY openssl/openssl-3.5.4/ /tmp/openssl-3.5.4/
+# COPY openssl/openssl-3.5.4/ /tmp/openssl-3.5.4/
 COPY openssl/openssl-3.5.4.tar.gz /tmp/
 
 # OpenSSL 3.5.4 빌드 (이미 빌드된 경우 스킵)
@@ -36,11 +36,11 @@ RUN if [ -f /tmp/openssl-3.5.4/libcrypto.so.3 ]; then \
     rm -rf /tmp/openssl-3.5.4 /tmp/openssl-3.5.4.tar.gz
 
 # 수정된 EYL 라이브러리 덮어쓰기
-COPY openssl/eyl/realize/ /tmp/eyl/
-RUN cp /tmp/eyl/libcrypto.so.3 /usr/local/openssl-3.5.4/lib64/ && \
-    cp /tmp/eyl/libssl.so.3 /usr/local/openssl-3.5.4/lib64/ && \
-    cp /tmp/eyl/openssl /usr/local/openssl-3.5.4/bin/ && \
-    rm -rf /tmp/eyl
+# COPY openssl/eyl/realize/ /tmp/eyl/
+# RUN cp /tmp/eyl/libcrypto.so.3 /usr/local/openssl-3.5.4/lib64/ && \
+#     cp /tmp/eyl/libssl.so.3 /usr/local/openssl-3.5.4/lib64/ && \
+#     cp /tmp/eyl/openssl /usr/local/openssl-3.5.4/bin/ && \
+#     rm -rf /tmp/eyl
 
 # 시스템 라이브러리 경로에 OpenSSL 3.5.4 추가
 RUN echo "/usr/local/openssl-3.5.4/lib64" > /etc/ld.so.conf.d/openssl-3.5.4.conf && \
